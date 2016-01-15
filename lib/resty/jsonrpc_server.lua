@@ -1,45 +1,68 @@
 -- Copyright (c) 2015, rryqszq4
 -- All rights reserved.
+-- curl -d "{\"method\":\"addition\", \"params\":[1,3]}" http://192.168.80.140/lua-jsonrpc-server
 
-cjson = require "cjson"
+local cjson = require "cjson"
 
-local _jsr_server = {
+local _M = {
 	_VERSION = '0.0.1'
 }
 
-function _jsr_server.new()
+local mt = { __index = _M }
+
+function _M.new(self)
+	local payload
+	local callbacks
+	local classes
+
+	ngx.req.read_body()
+
+	payload = cjson.decode(ngx.var.request_body)
+	callbacks = {}
+	
+	return 
+	setmetatable({
+		payload = payload,
+		callbacks = callbacks,
+	}, mt)
+end
+
+function _M.register(self, name, closure)
+	
+	self.callbacks[name] = closure 
 
 end
 
-function _jsr_server.register()
+function _M.bind()
 end
 
-function _jsr_server.bind()
+function _M.jsonformat()
 end
 
-function _jsr_server.jsonformat()
+function _M.rpcformat()
 end
 
-function _jsr_server.rpcformat()
+function _M.executeprocedure()
 end
 
-function _jsr_server.executeprocedure()
+function _M.executecallback()
 end
 
-function _jsr_server.executecallback()
+function _M.executemethod()
 end
 
-function _jsr_server.executemethod()
+function _M.getresponse()
 end
 
-function _jsr_server.getresponse()
+function _M.execute(self)
+
+	local method = self.callbacks[self.payload.method]
+	local success, ret = pcall(method, unpack(self.payload.params))
+	return ret
 end
 
-function _jsr_server.execute()
+function _M.destroy()
 end
 
-function _jsr_server.destroy()
-end
-
-return _jsr_server
+return _M
 
