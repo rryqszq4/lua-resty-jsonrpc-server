@@ -36,29 +36,31 @@ end
 function _M.bind()
 end
 
-function _M.jsonformat()
+function _M.json_format()
 end
 
-function _M.rpcformat()
+function _M.rpc_format()
 end
 
-function _M.executeprocedure()
+function _M.execute_procedure()
 end
 
-function _M.executecallback()
+function _M.execute_callback(self)
+	local method = self.callbacks[self.payload.method]
+	local success, result = pcall(method, unpack(self.payload.params))
+	return result
 end
 
-function _M.executemethod()
+function _M.execute_method()
 end
 
-function _M.getresponse()
+function _M.get_response()
 end
 
 function _M.execute(self)
 
-	local method = self.callbacks[self.payload.method]
-	local success, ret = pcall(method, unpack(self.payload.params))
-	return ret
+	local result = self:execute_callback()
+	return result
 end
 
 function _M.destroy()
