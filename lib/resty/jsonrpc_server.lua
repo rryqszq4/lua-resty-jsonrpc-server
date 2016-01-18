@@ -15,25 +15,32 @@ function _M.new(self)
 	local callbacks
 	local classes
 
-	--ngx.say(ngx.var.request_body);
-	--payload = cjson.decode(ngx.var.request_body)
 	payload = nil
 	callbacks = {}
+	classes = {}
 	
 	return 
 	setmetatable({
 		payload = payload,
 		callbacks = callbacks,
+		classes = classes
 	}, mt)
 end
 
-function _M.register(self, name, closure)
+function _M.register(self, procedure, closure)
 	
-	self.callbacks[name] = closure 
+	self.callbacks[procedure] = closure 
 
 end
 
-function _M.bind()
+function _M.bind(self, procedure, classname, method)
+
+	self.classes[procedure] = 
+	{
+		classname = classname,
+		method = method
+	}
+
 end
 
 function _M.json_format(self)
@@ -85,20 +92,37 @@ function _M.rpc_format(self)
 	return nil
 end
 
-function _M.execute_procedure()
-end
+function _M.execute_procedure(self, payload_method, payload_params)
 
-function _M.execute_callback(self)
-	local method = self.callbacks[self.payload.method]
-	if method ~= nil then
-		local success, result = pcall(method, unpack(self.payload.params))
-		return self:get_response(result)
-	else 
+	if type(self.callbacks[payload_method]) ~= "nil" then
+
+		return self:execute_callback(payload_method, payload_params)	
+
+	elseif type(self.classes[payload_method]) ~= "nil" then
+		
+		return self:execute_method(payload_method, payload_params)
+
+	else
+
 		return self:rpc_error(-32601, "Method not found")
+
 	end
+	
 end
 
-function _M.execute_method()
+function _M.execute_callback(self, method, params)
+	
+		local success, result = pcall(method, unpack(params))
+		return self:get_response(result)
+end
+
+function _M.execute_method(self, method, params)
+	
+	local classname = self.classes[method]["classname"]
+	local method = self.classes[method]["method"]
+	local success, result = pcall(classname[method], unpack(params))
+
+	return self:get_response(result)
 end
 
 function _M.get_response(self, data)
@@ -122,11 +146,8 @@ function _M.execute(self)
 		return self:rpc_error(result[1], result[2])
 	end
 
-	result = self:execute_callback()
-	ngx.say(result)
+	return self:execute_procedure(self.payload.method, self.payload.params)
 
-	--local result = self:execute_callback()
-	--return result
 end
 
 function _M.rpc_error(self, code, message)
@@ -138,9 +159,6 @@ function _M.rpc_error(self, code, message)
 		},
 		id = "null"
 	})
-end
-
-function _M.destroy()
 end
 
 return _M
