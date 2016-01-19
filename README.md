@@ -6,9 +6,10 @@ lua-resty-jsonrpc-server -- JsonRPC 2.0 server for ngx_lua
 Table of Contents
 =================
 
-* [Name](#name)
+* [Name](#lua-resty-jsonrpc-server)
 * [Description](#description)
 * [Synopsis](#synopsis)
+* [Curl test](#curl-test)
 * [Methods](#methods)
 	* [new](#new)
 	* [register](#register)
@@ -21,7 +22,7 @@ Table of Contents
 	* [get_response](#get_response)
 	* [execute](#execute)
 	* [rpc_error](#rpc_error)
-* [Jsonrpc 2.0 error](#jsonrpc-2.0-error)
+* [Jsonrpc 2.0 error](#jsonrpc-20-error)
 * [Author](#author)
 * [Copyright and License](#copyright-and-license)
 
@@ -66,41 +67,60 @@ server {
 
 ```
 
+Curl test
+=========
+
+```
+# curl -d "{\"jsonrpc\":\"2.0\",\"method\":\"addition\", \"params\":[1,5]}" http://localhost/lua-jsonrpc-server
+# {"result":6,"jsonrpc":"2.0","id":"null"}
+```
+
 Methods
 =======
 
 new
 ---
+`syntax: server, err = jsonrpc_server:new()`
 
 register
 --------
+`syntax: ok, err = jsonrpc_server:register(procedure, closure)`
 
 bind
 ----
+`syntax: ok, err = jsonrpc_server:bind(procedure, classname, method)`
 
 json_format
 -----------
+`syntax: ok, err = jsonrpc_server:json_format()`
 
 rpc_format
 ----------
+`syntax: ok, err = jsonrpc_server:rpc_format()`
 
 execute_procedure
 -----------------
+`syntax: ok, err = jsonrpc_server:execute_procedure(payload_method, payload_params)`
 
 execute_callback
 ----------------
+`syntax: ok, err = jsonrpc_server:execute_callback(method, params)`
 
 execute_method
 --------------
+`syntax: ok, err = jsonrpc_server:execute_method(method, params)`
 
 get_response
 ------------
+`syntax: ok, err = jsonrpc_server:get_response(data)`
 
 execute
 -------
+`syntax: ok, err = jsonrpc_server:execute()`
 
 rpc_error
 ---------
+`syntax: ok, err = jsonrpc_server:rpc_error(code, message)`
 
 Jsonrpc 2.0 error
 =================
