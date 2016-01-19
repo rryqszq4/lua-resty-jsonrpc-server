@@ -70,9 +70,14 @@ server {
 Curl test
 =========
 
+input
+```sh
+$ curl -d "{\"jsonrpc\":\"2.0\",\"method\":\"addition\", \"params\":[1,5]}" http://localhost/lua-jsonrpc-server
 ```
-# curl -d "{\"jsonrpc\":\"2.0\",\"method\":\"addition\", \"params\":[1,5]}" http://localhost/lua-jsonrpc-server
-# {"result":6,"jsonrpc":"2.0","id":"null"}
+
+output
+```sh
+$ {"result":6,"jsonrpc":"2.0","id":"null"}
 ```
 
 Methods
