@@ -1,6 +1,6 @@
 -- Copyright (c) 2015, rryqszq4
 -- All rights reserved.
--- curl -d "{\"method\":\"addition\", \"params\":[1,3]}" http://192.168.80.140/lua-jsonrpc-server
+-- curl -d "{\"method\":\"addition\", \"params\":[1,3]}" http://localhost/lua-jsonrpc-server
 
 local cjson = require "cjson"
 
@@ -111,9 +111,9 @@ function _M.execute_procedure(self, payload_method, payload_params)
 end
 
 function _M.execute_callback(self, method, params)
-	
-		local success, result = pcall(method, unpack(params))
-		return self:get_response(result)
+	local method = self.callbacks[method]
+	local success, result = pcall(method, unpack(params))
+	return self:get_response(result)
 end
 
 function _M.execute_method(self, method, params)
